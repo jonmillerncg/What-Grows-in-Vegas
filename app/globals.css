@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* ── Scroll-triggered fade-in ── */
+.fade-in {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.fade-in-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Star twinkle variants (used via inline animation-name) ── */
+@keyframes twinkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.08; transform: scale(0.55); }
+}
+@keyframes twinkle-b {
+  0%, 100% { opacity: 0.75; }
+  40%       { opacity: 0.05; }
+}
+@keyframes twinkle-c {
+  0%, 100% { opacity: 0.9; }
+  30%       { opacity: 0.5; }
+  65%       { opacity: 0.1; }
+}
+@keyframes moonGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 10px rgba(232,176,64,0.55))
+            drop-shadow(0 0 30px rgba(232,176,64,0.2));
+  }
+  50% {
+    filter: drop-shadow(0 0 22px rgba(232,176,64,0.9))
+            drop-shadow(0 0 60px rgba(232,176,64,0.45));
+  }
+}
