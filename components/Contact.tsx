@@ -1,61 +1,9 @@
 'use client'
-import { useState, FormEvent } from 'react'
+import { useForm, ValidationError } from '@formspree/react'
 import FadeIn from '@/components/FadeIn'
 
-type FormState = {
-  name: string
-  businessName: string
-  email: string
-  customerType: string
-  message: string
-  website: string   // honeypot — must stay empty
-}
-
-const initialForm: FormState = {
-  name: '',
-  businessName: '',
-  email: '',
-  customerType: '',
-  message: '',
-  website: '',
-}
-
 export default function Contact() {
-  const [form, setForm] = useState<FormState>(initialForm)
-  const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
-  const [errorMsg, setErrorMsg] = useState('')
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
-  }
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault()
-    setStatus('sending')
-    setErrorMsg('')
-
-    try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      })
-      const data = await res.json()
-
-      if (res.ok) {
-        setStatus('success')
-        setForm(initialForm)
-      } else {
-        setStatus('error')
-        setErrorMsg(data.error ?? 'Something went wrong. Please try again.')
-      }
-    } catch {
-      setStatus('error')
-      setErrorMsg('Network error. Please check your connection and try again.')
-    }
-  }
+  const [state, handleSubmit] = useForm('orders@yuccabekidding.com')
 
   return (
     <section id="contact" className="bg-forest py-24 md:py-32 px-6">
@@ -153,7 +101,7 @@ export default function Contact() {
               Send an inquiry
             </h3>
 
-            {status === 'success' ? (
+            {state.succeeded ? (
               <div className="text-center py-10" role="alert">
                 <div className="w-14 h-14 mx-auto mb-5 rounded-full bg-sage/20 flex items-center justify-center">
                   <svg viewBox="0 0 24 24" className="w-7 h-7 text-gold" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
@@ -164,28 +112,12 @@ export default function Contact() {
                 <p className="font-archivo text-cream/60 text-sm leading-relaxed">
                   Thanks for reaching out. Someone from our team will be in touch within one business day.
                 </p>
-                <button
-                  onClick={() => setStatus('idle')}
-                  className="mt-6 px-5 py-2 rounded-full border border-sage/30 text-cream/70 font-archivo-narrow uppercase tracking-wider text-xs hover:border-gold/50 hover:text-gold transition-colors"
-                >
-                  Send another
-                </button>
               </div>
             ) : (
               <form onSubmit={handleSubmit} noValidate>
-                {/* Honeypot — visually hidden, should stay empty */}
-                <div className="absolute w-0 h-0 overflow-hidden opacity-0 pointer-events-none" aria-hidden="true">
-                  <label htmlFor="website">Leave this empty</label>
-                  <input
-                    id="website"
-                    name="website"
-                    type="text"
-                    tabIndex={-1}
-                    autoComplete="off"
-                    value={form.website}
-                    onChange={handleChange}
-                  />
-                </div>
+
+                {/* Honeypot — Formspree ignores submissions where _gotcha is filled */}
+                <input type="text" name="_gotcha" className="hidden" tabIndex={-1} autoComplete="off" aria-hidden="true" />
 
                 <div className="space-y-4">
                   {/* Name */}
@@ -199,29 +131,27 @@ export default function Contact() {
                       type="text"
                       required
                       autoComplete="name"
-                      value={form.name}
-                      onChange={handleChange}
                       className="w-full bg-forest/60 border border-sage/25 rounded-lg px-4 py-3 text-cream placeholder-cream/30 font-archivo text-sm focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/25 transition"
                       placeholder="Jane Smith"
                     />
+                    <ValidationError prefix="Name" field="name" errors={state.errors} className="text-rust text-xs mt-1 font-archivo" />
                   </div>
 
                   {/* Business Name */}
                   <div>
-                    <label htmlFor="businessName" className="block font-archivo-narrow uppercase tracking-widest text-[0.62rem] text-cream/50 mb-1.5">
+                    <label htmlFor="business_name" className="block font-archivo-narrow uppercase tracking-widest text-[0.62rem] text-cream/50 mb-1.5">
                       Business Name *
                     </label>
                     <input
-                      id="businessName"
-                      name="businessName"
+                      id="business_name"
+                      name="business_name"
                       type="text"
                       required
                       autoComplete="organization"
-                      value={form.businessName}
-                      onChange={handleChange}
                       className="w-full bg-forest/60 border border-sage/25 rounded-lg px-4 py-3 text-cream placeholder-cream/30 font-archivo text-sm focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/25 transition"
                       placeholder="The Desert Table Restaurant"
                     />
+                    <ValidationError prefix="Business name" field="business_name" errors={state.errors} className="text-rust text-xs mt-1 font-archivo" />
                   </div>
 
                   {/* Email */}
@@ -235,33 +165,30 @@ export default function Contact() {
                       type="email"
                       required
                       autoComplete="email"
-                      value={form.email}
-                      onChange={handleChange}
                       className="w-full bg-forest/60 border border-sage/25 rounded-lg px-4 py-3 text-cream placeholder-cream/30 font-archivo text-sm focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/25 transition"
                       placeholder="jane@yourbusiness.com"
                     />
+                    <ValidationError prefix="Email" field="email" errors={state.errors} className="text-rust text-xs mt-1 font-archivo" />
                   </div>
 
                   {/* Customer Type */}
                   <div>
-                    <label htmlFor="customerType" className="block font-archivo-narrow uppercase tracking-widest text-[0.62rem] text-cream/50 mb-1.5">
+                    <label htmlFor="customer_type" className="block font-archivo-narrow uppercase tracking-widest text-[0.62rem] text-cream/50 mb-1.5">
                       Business Type
                     </label>
                     <select
-                      id="customerType"
-                      name="customerType"
-                      value={form.customerType}
-                      onChange={handleChange}
+                      id="customer_type"
+                      name="customer_type"
                       className="w-full bg-forest/60 border border-sage/25 rounded-lg px-4 py-3 text-cream font-archivo text-sm focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/25 transition appearance-none"
                     >
                       <option value="" className="bg-forest text-cream/60">Select a type…</option>
-                      <option value="retail" className="bg-forest">Retail grocery store</option>
-                      <option value="restaurant" className="bg-forest">Restaurant / food service</option>
-                      <option value="casino" className="bg-forest">Casino / resort kitchen</option>
-                      <option value="farm-to-table" className="bg-forest">Farm-to-table restaurant</option>
-                      <option value="independent-grocer" className="bg-forest">Independent grocer</option>
-                      <option value="distributor" className="bg-forest">Distributor / wholesaler</option>
-                      <option value="other" className="bg-forest">Other</option>
+                      <option value="Retail grocery store" className="bg-forest">Retail grocery store</option>
+                      <option value="Restaurant / food service" className="bg-forest">Restaurant / food service</option>
+                      <option value="Casino / resort kitchen" className="bg-forest">Casino / resort kitchen</option>
+                      <option value="Farm-to-table restaurant" className="bg-forest">Farm-to-table restaurant</option>
+                      <option value="Independent grocer" className="bg-forest">Independent grocer</option>
+                      <option value="Distributor / wholesaler" className="bg-forest">Distributor / wholesaler</option>
+                      <option value="Other" className="bg-forest">Other</option>
                     </select>
                   </div>
 
@@ -275,27 +202,22 @@ export default function Contact() {
                       name="message"
                       required
                       rows={4}
-                      value={form.message}
-                      onChange={handleChange}
                       className="w-full bg-forest/60 border border-sage/25 rounded-lg px-4 py-3 text-cream placeholder-cream/30 font-archivo text-sm focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/25 transition resize-none"
                       placeholder="Tell us about your business and what you're looking for…"
                     />
+                    <ValidationError prefix="Message" field="message" errors={state.errors} className="text-rust text-xs mt-1 font-archivo" />
                   </div>
 
-                  {/* Error message */}
-                  {status === 'error' && (
-                    <p className="text-sm font-archivo text-rust bg-rust/10 border border-rust/20 rounded-lg px-4 py-3" role="alert">
-                      {errorMsg}
-                    </p>
-                  )}
+                  {/* General form error */}
+                  <ValidationError errors={state.errors} className="text-sm font-archivo text-rust bg-rust/10 border border-rust/20 rounded-lg px-4 py-3" />
 
                   {/* Submit */}
                   <button
                     type="submit"
-                    disabled={status === 'sending'}
+                    disabled={state.submitting}
                     className="w-full py-3.5 rounded-full bg-gold text-near-black font-archivo-narrow uppercase tracking-wider text-sm font-bold hover:bg-gold-light transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
-                    {status === 'sending' ? (
+                    {state.submitting ? (
                       <>
                         <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
                           <path d="M21 12a9 9 0 1 1-6.219-8.56" />
