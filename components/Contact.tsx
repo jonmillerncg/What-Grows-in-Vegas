@@ -3,7 +3,7 @@ import { useForm, ValidationError } from '@formspree/react'
 import FadeIn from '@/components/FadeIn'
 
 export default function Contact() {
-  const [state, handleSubmit] = useForm('orders@yuccabekidding.com')
+  const [state, handleSubmit] = useForm(process.env.NEXT_PUBLIC_FORMSPREE_URL!)
 
   return (
     <section id="contact" className="bg-forest py-24 md:py-32 px-6">
