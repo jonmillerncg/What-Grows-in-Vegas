@@ -1,5 +1,5 @@
+import Image from 'next/image'
 import FadeIn from '@/components/FadeIn'
-import DesertSunset from '@/components/illustrations/DesertSunset'
 
 export default function About() {
   return (
@@ -69,10 +69,16 @@ export default function About() {
           </FadeIn>
         </FadeIn>
 
-        {/* Right column — illustration */}
+        {/* Right column — landscape photo */}
         <FadeIn delay={120} className="flex items-center justify-center">
-          <div className="w-full max-w-md rounded-2xl overflow-hidden shadow-2xl">
-            <DesertSunset />
+          <div className="relative w-full max-w-md aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
+            <Image
+              src="/about/desert-sunset.png"
+              alt="Southwest desert sunset landscape with saguaro cacti and red rock mesas"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 448px"
+            />
           </div>
         </FadeIn>
 

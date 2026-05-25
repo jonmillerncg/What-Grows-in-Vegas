@@ -1,5 +1,5 @@
 'use client'
-import DesertNight from '@/components/illustrations/DesertNight'
+import Image from 'next/image'
 
 // Deterministic pseudo-random star positions (no Math.random — avoids hydration mismatch)
 const STAR_COUNT = 120
@@ -27,6 +27,20 @@ export default function Hero() {
       className="relative bg-forest min-h-screen overflow-hidden flex flex-col"
       aria-label="Hero"
     >
+      {/* ── Photo background ── */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+        <Image
+          src="/hero/desert-night.png"
+          alt=""
+          fill
+          priority
+          className="object-cover object-center"
+          sizes="100vw"
+        />
+        {/* Dark overlay to preserve text contrast and forest-green tone */}
+        <div className="absolute inset-0 bg-forest/75" />
+      </div>
+
       {/* ── Starfield ── */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         {stars.map((s, i) => (
@@ -63,7 +77,6 @@ export default function Hero() {
             </radialGradient>
           </defs>
           <circle cx="45" cy="45" r="40" fill="url(#moonGrad)" opacity="0.92" />
-          {/* Subtle surface texture */}
           <circle cx="36" cy="38" r="6" fill="#E0A830" opacity="0.18" />
           <circle cx="52" cy="52" r="4" fill="#D49820" opacity="0.14" />
           <circle cx="42" cy="56" r="3" fill="#D49820" opacity="0.1" />
@@ -115,14 +128,6 @@ export default function Hero() {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* ── Desert landscape SVG ── */}
-      <div
-        className="absolute bottom-[72px] md:bottom-[68px] left-0 right-0 pointer-events-none"
-        aria-hidden="true"
-      >
-        <DesertNight />
       </div>
     </section>
   )
